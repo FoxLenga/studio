@@ -72,7 +72,7 @@ export function TaskItem({ task }: TaskItemProps) {
 
   return (
     <>
-      <Card className={cn("transition-all", task.completed && "bg-muted/50")}>
+      <Card className={cn("transition-all animate-fade-in-up", task.completed && "bg-muted/50")}>
         <CardHeader className="flex flex-row items-start gap-4 space-y-0 p-4">
           <div className="flex items-center h-full pt-1">
             <Checkbox
