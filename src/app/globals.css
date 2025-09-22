@@ -67,6 +67,18 @@ body {
     @apply border-border;
   }
   body {
-    @apply bg-background text-foreground;
+    @apply text-foreground;
+    background-color: hsl(var(--background));
+    background-image: radial-gradient(
+        circle at 25px 25px,
+        hsl(var(--background) / 0.8),
+        hsl(var(--background) / 0.9) 25%,
+        transparent
+      ),
+      radial-gradient(
+        circle at 75% 75%,
+        hsl(var(--background) / 0.7),
+        transparent
+      );
   }
 }
