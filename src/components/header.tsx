@@ -19,6 +19,7 @@ import {
 } from '@/components/ui/dropdown-menu';
 import { Logo } from '@/components/logo';
 import { useToast } from '@/hooks/use-toast';
+import { ThemeToggle } from './theme-toggle';
 
 export function AppHeader() {
   const { user, loading } = useAuth();
@@ -53,6 +54,7 @@ export function AppHeader() {
         </div>
 
         <div className="flex flex-1 items-center justify-end space-x-2">
+          <ThemeToggle />
           {loading ? null : user ? (
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
