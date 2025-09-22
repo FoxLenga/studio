@@ -23,7 +23,7 @@ TaskEase is a modern, full-stack task management application built with Next.js 
 - **Database & Authentication**: [Firebase](https://firebase.google.com/) (Firestore & Auth)
 - **UI**: [React](https://reactjs.org/), [Shadcn/UI](https://ui.shadcn.com/), [Tailwind CSS](https://tailwindcss.com/)
 - **Testing**: [Jest](https://jestjs.io/) & [React Testing Library](https://testing-library.com/docs/react-testing-library/intro/)
-- **Deployment**: [Firebase App Hosting](https://firebase.google.com/docs/app-hosting)
+- **Deployment**: [Vercel](https://vercel.com/)
 
 ## Getting Started
 
@@ -107,23 +107,18 @@ The application uses a single Firestore collection named `tasks`. Each document 
 
 ## Deployment
 
-This application is configured for easy deployment with **Firebase App Hosting**.
+This application is configured for easy deployment with **Vercel**.
 
-1.  **Install the Firebase CLI:**
-    If you haven't already, install the Firebase command-line tools:
-    ```sh
-    npm install -g firebase-tools
-    ```
+1.  **Push to GitHub:**
+    Push your project's code to a GitHub repository.
 
-2.  **Login to Firebase:**
-    ```sh
-    firebase login
-    ```
+2.  **Import Project on Vercel:**
+    - Go to your [Vercel dashboard](https://vercel.com/dashboard) and click "Add New... > Project".
+    - Select your GitHub repository. Vercel will automatically detect that you're using Next.js.
 
-3.  **Deploy the application:**
-    From the root of your project, run the deploy command:
-    ```sh
-    firebase deploy --only hosting
-    ```
-
-Firebase will build your Next.js application and deploy it to a live URL. The `apphosting.yaml` file in the repository contains the configuration for the hosting service.
+3.  **Configure Environment Variables:**
+    - In your Vercel project settings, navigate to the "Environment Variables" section.
+    - Add the Firebase configuration keys that you have in your `.env.local` file. Make sure to name them exactly the same (e.g., `NEXT_PUBLIC_FIREBASE_API_KEY`).
+    
+4.  **Deploy:**
+    - Click the "Deploy" button. Vercel will build your application and deploy it. Any subsequent pushes to your main branch will automatically trigger new deployments.
