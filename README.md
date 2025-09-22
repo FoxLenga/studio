@@ -13,6 +13,8 @@ TaskEase is a modern, full-stack task management application built with Next.js 
 - **Real-time Updates**: Tasks are updated in real-time across devices using Firebase Firestore.
 - **Modern UI**: Sleek and responsive interface built with Shadcn/UI and Tailwind CSS.
 - **Offline Persistence**: Tasks are available even with an unstable or no internet connection thanks to Firestore's offline capabilities.
+- **Dark Mode**: Supports light, dark, and system themes.
+- **Animations**: Subtle animations for a more engaging user experience.
 
 ## Tech Stack
 
@@ -121,7 +123,7 @@ This application is configured for easy deployment with **Firebase App Hosting**
 3.  **Deploy the application:**
     From the root of your project, run the deploy command:
     ```sh
-    firebase deploy --only apphosting
+    firebase deploy --only hosting
     ```
 
 Firebase will build your Next.js application and deploy it to a live URL. The `apphosting.yaml` file in the repository contains the configuration for the hosting service.
