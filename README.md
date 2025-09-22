@@ -120,13 +120,13 @@ This application is configured for easy deployment with **Firebase App Hosting**
     firebase init hosting
     ```
     - Select your Firebase project.
-    - When asked for your public directory, just press Enter (the `source` in `firebase.json` handles this).
-    - Select **No** when asked to configure as a single-page app.
+    - When asked for your public directory, enter `.` and press Enter.
+    - Select **Yes** when asked to configure as a single-page app (this helps with client-side routing).
     - Select **No** when asked to set up automatic builds and deploys with GitHub.
 
 3.  **Deploy:**
     Run the following command to build and deploy your application:
     ```sh
-    firebase deploy --only hosting
+    firebase deploy
     ```
-    Firebase will automatically build your Next.js application and deploy it.
+    Firebase will automatically build your Next.js application and deploy it to App Hosting.
