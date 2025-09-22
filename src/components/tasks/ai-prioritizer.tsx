@@ -1,13 +1,15 @@
 'use client';
 
 import { useState } from 'react';
-import { Sparkles, ArrowDownUp } from 'lucide-react';
+import { Sparkles } from 'lucide-react';
+import { writeBatch, doc } from 'firebase/firestore';
 
 import { Button } from '@/components/ui/button';
 import {
   Dialog,
   DialogContent,
   DialogDescription,
+  DialogFooter,
   DialogHeader,
   DialogTitle,
   DialogTrigger,
@@ -17,6 +19,7 @@ import type { Task } from '@/lib/types';
 import { prioritizeTasks, PrioritizeTasksOutput } from '@/ai/flows/task-prioritization';
 import { Spinner } from '../ui/spinner';
 import { Badge } from '../ui/badge';
+import { db } from '@/lib/firebase';
 
 interface AIPrioritizerProps {
   tasks: Task[];
@@ -25,14 +28,23 @@ interface AIPrioritizerProps {
 export function AIPrioritizer({ tasks }: AIPrioritizerProps) {
   const [isOpen, setIsOpen] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [isSaving, setIsSaving] = useState(false);
   const [prioritizedTasks, setPrioritizedTasks] = useState<PrioritizeTasksOutput>([]);
   const { toast } = useToast();
 
-  const handlePrioritize = async () => {
+  const handleOpenAndPrioritize = async () => {
+    if (tasks.length < 2) {
+      toast({
+        title: 'Not enough tasks',
+        description: 'You need at least two active tasks to use the AI Prioritizer.',
+      });
+      return;
+    }
+    setIsOpen(true);
     setLoading(true);
     setPrioritizedTasks([]);
     try {
-      const tasksToPrioritize = tasks.map(({ title, description }) => ({ title, description }));
+      const tasksToPrioritize = tasks.map(({ title, description }) => ({ title, description: description || '' }));
       const result = await prioritizeTasks(tasksToPrioritize);
       setPrioritizedTasks(result);
     } catch (error) {
@@ -47,6 +59,36 @@ export function AIPrioritizer({ tasks }: AIPrioritizerProps) {
     }
   };
 
+  const handleSavePriorities = async () => {
+    if (!prioritizedTasks.length) return;
+    setIsSaving(true);
+    const batch = writeBatch(db);
+    const taskMap = new Map(tasks.map(t => [t.title, t.id]));
+
+    prioritizedTasks.forEach(pTask => {
+        const taskId = taskMap.get(pTask.title);
+        if (taskId) {
+            const taskRef = doc(db, 'tasks', taskId);
+            batch.update(taskRef, { 
+                priority: pTask.priority,
+                reason: pTask.reason
+            });
+        }
+    });
+
+    try {
+        await batch.commit();
+        toast({ title: 'Priorities saved!', description: 'Your task list has been updated.' });
+        setIsOpen(false);
+    } catch (error) {
+        console.error(error);
+        toast({ title: 'Error saving priorities', description: 'Please try again later.', variant: 'destructive' });
+    } finally {
+        setIsSaving(false);
+    }
+  };
+
+
   const getPriorityBadgeVariant = (priority: number) => {
     if (priority === 1) return 'destructive';
     if (priority === 2) return 'default';
@@ -59,7 +101,7 @@ export function AIPrioritizer({ tasks }: AIPrioritizerProps) {
         <Button
           variant="outline"
           disabled={tasks.length < 2}
-          onClick={handlePrioritize}
+          onClick={handleOpenAndPrioritize}
         >
           <Sparkles className="-ml-1 mr-2 h-5 w-5" />
           AI Prioritize
@@ -95,6 +137,12 @@ export function AIPrioritizer({ tasks }: AIPrioritizerProps) {
             </div>
           )}
         </div>
+        <DialogFooter>
+          <Button onClick={() => setIsOpen(false)} variant="ghost">Cancel</Button>
+          <Button onClick={handleSavePriorities} disabled={isSaving || loading || !prioritizedTasks.length}>
+            {isSaving ? <Spinner /> : 'Save Priorities'}
+          </Button>
+        </DialogFooter>
       </DialogContent>
     </Dialog>
   );

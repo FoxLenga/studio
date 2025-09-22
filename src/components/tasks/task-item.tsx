@@ -3,6 +3,7 @@
 import { doc, updateDoc, deleteDoc } from 'firebase/firestore';
 import { MoreHorizontal, Calendar, Trash2, Edit } from 'lucide-react';
 import { formatDistanceToNow } from 'date-fns';
+import { useState } from 'react';
 
 import { db } from '@/lib/firebase';
 import type { Task } from '@/lib/types';
@@ -16,9 +17,9 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
+import { Badge } from '@/components/ui/badge';
 import { DeleteTaskAlert } from './delete-task-alert';
 import { EditTask } from './edit-task';
-import { useState } from 'react';
 import { cn } from '@/lib/utils';
 
 interface TaskItemProps {
@@ -62,6 +63,12 @@ export function TaskItem({ task }: TaskItemProps) {
       });
     }
   };
+  
+  const getPriorityBadgeVariant = (priority: number) => {
+    if (priority === 1) return 'destructive';
+    if (priority === 2) return 'default';
+    return 'secondary';
+  }
 
   return (
     <>
@@ -76,9 +83,16 @@ export function TaskItem({ task }: TaskItemProps) {
             />
           </div>
           <div className="grid gap-1 flex-1">
-            <CardTitle className={cn("text-lg", task.completed && "line-through text-muted-foreground")}>
-              {task.title}
-            </CardTitle>
+            <div className="flex items-center gap-2">
+              <CardTitle className={cn("text-lg", task.completed && "line-through text-muted-foreground")}>
+                {task.title}
+              </CardTitle>
+              {task.priority && !task.completed && (
+                <Badge variant={getPriorityBadgeVariant(task.priority)}>
+                  Priority {task.priority}
+                </Badge>
+              )}
+            </div>
             {task.description && (
               <CardDescription className={cn(task.completed && "line-through text-muted-foreground/80")}>
                 {task.description}
@@ -104,14 +118,16 @@ export function TaskItem({ task }: TaskItemProps) {
             </DropdownMenuContent>
           </DropdownMenu>
         </CardHeader>
-        <CardContent className="p-4 pt-0">
-          <div className="flex items-center space-x-2 text-sm text-muted-foreground">
-            <Calendar className="h-4 w-4" />
-            <span>
-              Created {formatDistanceToNow(task.createdAt.toDate(), { addSuffix: true })}
-            </span>
-          </div>
-        </CardContent>
+        {task.createdAt && (
+          <CardContent className="p-4 pt-0">
+            <div className="flex items-center space-x-2 text-sm text-muted-foreground">
+              <Calendar className="h-4 w-4" />
+              <span>
+                Created {formatDistanceToNow(task.createdAt.toDate(), { addSuffix: true })}
+              </span>
+            </div>
+          </CardContent>
+        )}
       </Card>
 
       <EditTask

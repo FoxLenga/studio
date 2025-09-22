@@ -37,13 +37,7 @@ const prompt = ai.definePrompt({
   name: 'prioritizeTasksPrompt',
   input: {schema: PrioritizeTasksInputSchema},
   output: {schema: PrioritizeTasksOutputSchema},
-  prompt: `You are an AI task prioritization expert. Given a list of tasks with titles and descriptions, you will prioritize them based on importance and urgency. Return the tasks with an added "priority" field (1 being the highest priority) and a "reason" field explaining why that priority was assigned.
-
-Tasks:
-{{#each this}}
-- Title: {{{title}}}
-  Description: {{{description}}}
-{{/each}}`,
+  prompt: `You are an AI task prioritization expert. Given a list of tasks with titles and descriptions, you will prioritize them based on importance and urgency. Return the tasks with an added \"priority\" field (1 being the highest priority) and a \"reason\" field explaining why that priority was assigned.\n\nTasks:\n{{#each this}}\n- Title: {{{title}}}\n  Description: {{{description}}}\n{{/each}}`,
 });
 
 const prioritizeTasksFlow = ai.defineFlow(

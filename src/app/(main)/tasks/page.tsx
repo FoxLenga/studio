@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import { collection, query, where, onSnapshot, orderBy } from 'firebase/firestore';
-import { FilePlus2, Sparkles } from 'lucide-react';
+import { FilePlus2 } from 'lucide-react';
 
 import { useAuth } from '@/hooks/use-auth';
 import { db } from '@/lib/firebase';
@@ -33,6 +33,27 @@ export default function TasksPage() {
       querySnapshot.forEach((doc) => {
         tasksData.push({ id: doc.id, ...doc.data() } as Task);
       });
+      
+      tasksData.sort((a, b) => {
+        // 1. Incomplete tasks come before complete tasks
+        if (a.completed !== b.completed) {
+          return a.completed ? 1 : -1;
+        }
+    
+        // 2. For tasks with same completion status, sort by priority
+        const priorityA = a.priority ?? Number.MAX_SAFE_INTEGER;
+        const priorityB = b.priority ?? Number.MAX_SAFE_INTEGER;
+        if (priorityA !== priorityB) {
+          return priorityA - priorityB;
+        }
+    
+        // 3. Fallback to creation time
+        if (a.createdAt && b.createdAt) {
+          return b.createdAt.toMillis() - a.createdAt.toMillis();
+        }
+        return 0;
+      });
+
       setTasks(tasksData);
       setLoading(false);
     }, (error) => {
