@@ -23,7 +23,7 @@ TaskEase is a modern, full-stack task management application built with Next.js 
 - **Database & Authentication**: [Firebase](https://firebase.google.com/) (Firestore & Auth)
 - **UI**: [React](https://reactjs.org/), [Shadcn/UI](https://ui.shadcn.com/), [Tailwind CSS](https://tailwindcss.com/)
 - **Testing**: [Jest](https://jestjs.io/) & [React Testing Library](https://testing-library.com/docs/react-testing-library/intro/)
-- **Deployment**: [Vercel](https://vercel.com/)
+- **Deployment**: [Firebase App Hosting](https://firebase.google.com/docs/hosting)
 
 ## Getting Started
 
@@ -84,7 +84,7 @@ Follow these instructions to get a local copy up and running.
 
 ## Design Decisions & Trade-offs
 
-- **Framework Choice**: **Next.js** was chosen for its robust feature set, including the App Router for clean routing, Server Components for performance, and seamless integration with Vercel for deployment.
+- **Framework Choice**: **Next.js** was chosen for its robust feature set, including the App Router for clean routing, Server Components for performance, and seamless integration with Firebase for deployment.
 - **Database**: **Firebase Firestore** was selected for its real-time capabilities, excellent offline persistence, and tight integration with Firebase Authentication. The choice to use the client-side SDK directly simplifies the architecture by removing the need for a separate backend API layer for CRUD operations.
     - **Trade-off**: While simpler, this approach means that data validation and security rely more heavily on Firestore Security Rules rather than a server-side API.
 - **AI Integration**: **Genkit** provides a structured and maintainable way to define and manage AI flows. It simplifies calling the Google Gemini models and allows for easy testing and monitoring of AI functionality through its developer UI.
@@ -107,18 +107,26 @@ The application uses a single Firestore collection named `tasks`. Each document 
 
 ## Deployment
 
-This application is configured for easy deployment with **Vercel**.
+This application is configured for easy deployment with **Firebase App Hosting**.
 
-1.  **Push to GitHub:**
-    Push your project's code to a GitHub repository.
+1.  **Login to Firebase:**
+    ```sh
+    firebase login
+    ```
 
-2.  **Import Project on Vercel:**
-    - Go to your [Vercel dashboard](https://vercel.com/dashboard) and click "Add New... > Project".
-    - Select your GitHub repository. Vercel will automatically detect that you're using Next.js.
+2.  **Initialize Firebase:**
+    If you haven't already, link your project directory to your Firebase project.
+    ```sh
+    firebase init hosting
+    ```
+    - Select your Firebase project.
+    - When asked for your public directory, just press Enter (the `source` in `firebase.json` handles this).
+    - Select **No** when asked to configure as a single-page app.
+    - Select **No** when asked to set up automatic builds and deploys with GitHub.
 
-3.  **Configure Environment Variables:**
-    - In your Vercel project settings, navigate to the "Environment Variables" section.
-    - Add the Firebase configuration keys that you have in your `.env.local` file. Make sure to name them exactly the same (e.g., `NEXT_PUBLIC_FIREBASE_API_KEY`).
-    
-4.  **Deploy:**
-    - Click the "Deploy" button. Vercel will build your application and deploy it. Any subsequent pushes to your main branch will automatically trigger new deployments.
+3.  **Deploy:**
+    Run the following command to build and deploy your application:
+    ```sh
+    firebase deploy --only hosting
+    ```
+    Firebase will automatically build your Next.js application and deploy it.

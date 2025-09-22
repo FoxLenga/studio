@@ -1,0 +1,42 @@
+# The main backend service for your app
+run:
+  # The command to start your app
+  command: npm run start
+  # The service account your app will run as
+  serviceAccount: app-hosting-run-invoker
+# The number of CPUs and amount of memory to allocate to your app
+resources:
+  cpu: 0.5
+  memoryMiB: 512
+# The environment variables to pass to your app
+env:
+  - variable: FIREBASE_APP_ID
+    value: ${FIREBASE_APP_ID:defaultValue}
+    availability:
+      - BUILD
+      - RUNTIME
+  - variable: FIREBASE_API_KEY
+    value: ${FIREBASE_API_KEY:defaultValue}
+    availability:
+      - BUILD
+      - RUNTIME
+  - variable: FIREBASE_AUTH_DOMAIN
+    value: ${FIREBASE_AUTH_DOMAIN:defaultValue}
+    availability:
+      - BUILD
+      - RUNTIME
+  - variable: FIREBASE_PROJECT_ID
+    value: ${FIREBASE_PROJECT_ID:defaultValue}
+    availability:
+      - BUILD
+      - RUNTIME
+  - variable: FIREBASE_STORAGE_BUCKET
+    value: ${FIREBASE_STORAGE_BUCKET:defaultValue}
+    availability:
+      - BUILD
+      - RUNTIME
+  - variable: FIREBASE_MESSAGING_SENDER_ID
+    value: ${FIREBASE_MESSAGING_SENDER_ID:defaultValue}
+    availability:
+      - BUILD
+      - RUNTIME
