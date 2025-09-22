@@ -20,7 +20,7 @@ TaskEase is a modern, full-stack task management application built with Next.js 
 - **AI**: [Genkit](https://firebase.google.com/docs/genkit) with [Google's Gemini 2.5 Flash](https://deepmind.google/technologies/gemini/flash/)
 - **Database & Authentication**: [Firebase](https://firebase.google.com/) (Firestore & Auth)
 - **UI**: [React](https://reactjs.org/), [Shadcn/UI](https://ui.shadcn.com/), [Tailwind CSS](https://tailwindcss.com/)
-- **Styling**: [Lucide React](https://lucide.dev/guide/packages/lucide-react) for icons
+- **Testing**: [Jest](https://jestjs.io/) & [React Testing Library](https://testing-library.com/docs/react-testing-library/intro/)
 - **Deployment**: [Firebase App Hosting](https://firebase.google.com/docs/app-hosting)
 
 ## Getting Started
@@ -31,6 +31,7 @@ Follow these instructions to get a local copy up and running.
 
 - Node.js (v18 or later recommended)
 - `npm` or `yarn`
+- A Firebase project.
 
 ### Installation & Setup
 
@@ -45,10 +46,18 @@ Follow these instructions to get a local copy up and running.
     npm install
     ```
 
-3.  **Set up Firebase:**
-    The project is pre-configured to connect to a Firebase project. The necessary configuration is in `src/lib/firebase.ts`.
+3.  **Set up Environment Variables:**
+    Create a file named `.env.local` in the root of your project and add your Firebase project's configuration keys. You can find these in your Firebase project settings.
+    ```
+    NEXT_PUBLIC_FIREBASE_API_KEY=your_api_key
+    NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN=your_auth_domain
+    NEXT_PUBLIC_FIREBASE_PROJECT_ID=your_project_id
+    NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET=your_storage_bucket
+    NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID=your_messaging_sender_id
+    NEXT_PUBLIC_FIREBASE_APP_ID=your_app_id
+    ```
 
-4.  **Run the development server:**
+4.  **Run the development servers:**
     The application uses two development servers: one for the Next.js frontend and one for the Genkit AI flows.
 
     -   **Start the Next.js app:**
@@ -64,20 +73,55 @@ Follow these instructions to get a local copy up and running.
         ```
         This starts the Genkit development UI at `http://localhost:4000`, which you can use to inspect and test your AI flows.
 
-## Project Structure
+5.  **Run Tests:**
+    To run the automated tests, use the following command:
+    ```sh
+    npm test
+    ```
+    This will start Jest in watch mode, automatically re-running tests as you make changes to the code.
 
-The project follows a standard Next.js App Router structure. Key directories include:
+## Design Decisions & Trade-offs
 
--   `src/app`: Contains all routes and UI pages.
--   `src/ai`: Houses all Genkit-related code, including AI flows.
--   `src/components`: Contains reusable React components.
--   `src/lib`: Includes Firebase configuration and other core utilities.
--   `src/hooks`: Custom React hooks, such as `useAuth`.
+- **Framework Choice**: **Next.js** was chosen for its robust feature set, including the App Router for clean routing, Server Components for performance, and seamless integration with Vercel for deployment.
+- **Database**: **Firebase Firestore** was selected for its real-time capabilities, excellent offline persistence, and tight integration with Firebase Authentication. The choice to use the client-side SDK directly simplifies the architecture by removing the need for a separate backend API layer for CRUD operations.
+    - **Trade-off**: While simpler, this approach means that data validation and security rely more heavily on Firestore Security Rules rather than a server-side API.
+- **AI Integration**: **Genkit** provides a structured and maintainable way to define and manage AI flows. It simplifies calling the Google Gemini models and allows for easy testing and monitoring of AI functionality through its developer UI.
+- **UI & Styling**: **Shadcn/UI** and **Tailwind CSS** were chosen for their modern, utility-first approach to building a consistent and responsive user interface. Shadcn provides beautiful, accessible, and unstyled components that are easy to customize.
 
-For a detailed breakdown of the file structure, see [repository-layout.md](./repository-layout.md).
+## Firestore Data Structure
 
-## Firebase Integration
+The application uses a single Firestore collection named `tasks`. Each document within this collection represents a single task and has the following structure:
 
--   **Authentication**: Managed in `src/hooks/use-auth.tsx`, providing session management and route protection.
--   **Firestore**: The Firebase SDK is initialized in `src/lib/firebase.ts`. Task operations (CRUD) are performed directly from the client-side components in `src/components/tasks/` and the main tasks page at `src/app/(main)/tasks/page.tsx`.
--   **Security Rules**: For a production application, you would need to configure Firestore Security Rules to ensure users can only access their own data.
+| Field         | Type      | Description                                               |
+|---------------|-----------|-----------------------------------------------------------|
+| `title`       | `string`  | The title of the task.                                    |
+| `description` | `string`  | A more detailed description of the task (optional).       |
+| `completed`   | `boolean` | `true` if the task is completed, otherwise `false`.       |
+| `ownerId`     | `string`  | The UID of the user who owns the task. Used for security. |
+| `priority`    | `number`  | The AI-assigned priority (1 is highest). Optional.        |
+| `reason`      | `string`  | The AI-generated reason for the assigned priority. Optional.|
+| `createdAt`   | `Timestamp`| The server timestamp when the task was created.           |
+| `updatedAt`   | `Timestamp`| The server timestamp when the task was last updated.      |
+
+## Deployment
+
+This application is configured for easy deployment with **Firebase App Hosting**.
+
+1.  **Install the Firebase CLI:**
+    If you haven't already, install the Firebase command-line tools:
+    ```sh
+    npm install -g firebase-tools
+    ```
+
+2.  **Login to Firebase:**
+    ```sh
+    firebase login
+    ```
+
+3.  **Deploy the application:**
+    From the root of your project, run the deploy command:
+    ```sh
+    firebase deploy --only apphosting
+    ```
+
+Firebase will build your Next.js application and deploy it to a live URL. The `apphosting.yaml` file in the repository contains the configuration for the hosting service.
